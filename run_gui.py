@@ -6,6 +6,44 @@
 """
 
 import os, re, sys, copy, threading, subprocess
+import warnings
+warnings.filterwarnings("ignore")
+
+# ── 启动前检查依赖，缺少时弹窗提示而不是直接闪退 ──
+def _check_deps():
+    missing = []
+    try:
+        import tkinter
+    except ImportError:
+        # tkinter 缺失时只能打印，没有窗口
+        print("错误：tkinter 未安装。Windows请重装Python并勾选tcl/tk，Mac请安装python-tk。")
+        sys.exit(1)
+    try:
+        import pandas
+    except ImportError:
+        missing.append("pandas")
+    try:
+        import openpyxl
+    except ImportError:
+        missing.append("openpyxl")
+    try:
+        import docx
+    except ImportError:
+        missing.append("python-docx")
+    if missing:
+        import tkinter as _tk
+        import tkinter.messagebox as _mb
+        _r = _tk.Tk(); _r.withdraw()
+        _mb.showerror(
+            "缺少依赖",
+            f"以下依赖未安装，请先在命令行运行：\n\n"
+            f"pip install {' '.join(missing)}\n\n"
+            f"安装完成后重新运行本程序。"
+        )
+        sys.exit(1)
+
+_check_deps()
+
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, scrolledtext
 from pathlib import Path
@@ -13,8 +51,6 @@ import pandas as pd
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 from docx import Document
-import warnings
-warnings.filterwarnings("ignore")
 
 # ─────────────────────────────────────────────
 # 校验规则
@@ -630,5 +666,20 @@ class App(tk.Tk):
 # 入口
 # ─────────────────────────────────────────────
 if __name__ == "__main__":
-    app = App()
-    app.mainloop()
+    try:
+        app = App()
+        app.mainloop()
+    except Exception as e:
+        import traceback
+        # 写错误日志到桌面，方便排查
+        log_path = Path.home() / "Desktop" / "case_tool_error.log"
+        try:
+            log_path.write_text(traceback.format_exc(), encoding="utf-8")
+        except Exception:
+            log_path = Path.home() / "case_tool_error.log"
+            log_path.write_text(traceback.format_exc(), encoding="utf-8")
+        try:
+            messagebox.showerror("启动失败",
+                f"程序出现错误：\n{e}\n\n错误日志已保存到：\n{log_path}")
+        except Exception:
+            print(traceback.format_exc())
