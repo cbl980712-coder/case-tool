@@ -78,8 +78,14 @@ def parse_text(text: str, fields: list) -> list:
         record = {"序号": idx, "案号": ""}
         for line in block.splitlines():
             line = line.strip()
+            # 同时支持中文冒号"："和英文冒号":"
+            sep = None
             if "：" in line:
-                key, _, val = line.partition("：")
+                sep = "："
+            elif ":" in line:
+                sep = ":"
+            if sep:
+                key, _, val = line.partition(sep)
                 key = key.strip(); val = val.strip()
                 if key in fields:
                     record[key] = val
