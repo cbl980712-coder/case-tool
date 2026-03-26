@@ -562,17 +562,8 @@ class App(tk.Tk):
     def _run_threaded(self):
         # 禁用按钮，防止重复点击
         self._set_btn_state("running")
-        t = threading.Thread(target=self._run_safe, daemon=True)
+        t = threading.Thread(target=self._run, daemon=True)
         t.start()
-
-    def _run_safe(self):
-        try:
-            self._run()
-        except Exception as e:
-            import traceback
-            self._log(f"[严重错误] {e}")
-            self._log(traceback.format_exc())
-            self._set_btn_state("normal")
 
     def _set_btn_state(self, state):
         def _do():
@@ -585,7 +576,6 @@ class App(tk.Tk):
     def _run(self):
         self._log("\n" + "="*50)
         self._log("开始执行...")
-        self._log(f"[调试] Python版本: {sys.version}")
         self._set_progress(0)
 
         out_dir    = Path(self.output_dir.get().strip())
