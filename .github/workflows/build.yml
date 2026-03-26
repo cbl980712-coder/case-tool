@@ -27,13 +27,18 @@ jobs:
 
       - name: 打包 EXE
         run: |
-          pyinstaller --onefile --windowed --name "批量文书生成工具v1" run_gui.py
+          pyinstaller --onefile --windowed --name "批量文书生成工具" run_gui.py
 
-      - name: 上传 Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: 批量文书生成工具v1-Windows
-          path: dist/批量文书生成工具v1.exe
+      - name: 整理发布包
+        shell: bash
+        run: |
+          mkdir -p release_pkg
+          cp "dist/批量文书生成工具.exe" "release_pkg/批量文书生成工具.exe"
+          cp "使用说明.txt" "release_pkg/使用说明.txt"
+          cp "模板制作说明.txt" "release_pkg/模板制作说明.txt"
+          cp "名单示例.txt" "release_pkg/名单示例.txt"
+          cd release_pkg
+          7z a "../批量文书生成工具_完整包.zip" .
 
       - name: 发布 Release
         uses: softprops/action-gh-release@v2
@@ -41,5 +46,12 @@ jobs:
           tag_name: v1.0.${{ github.run_number }}
           name: "批量文书生成工具 v1.0.${{ github.run_number }}"
           body: |
-            双击 exe 直接运行，无需安装 Python 或任何依赖。
-          files: dist/批量文书生成工具v1.exe
+            ## 下载说明
+            下载 **批量文书生成工具_完整包.zip**，解压后包含：
+            - `批量文书生成工具.exe` — 双击直接运行
+            - `使用说明.txt` — 完整操作步骤
+            - `模板制作说明.txt` — Word模板怎么做
+            - `名单示例.txt` — 名单格式示例
+
+            **无需安装Python，双击即用。**
+          files: 批量文书生成工具_完整包.zip

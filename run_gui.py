@@ -422,9 +422,10 @@ class App(tk.Tk):
         # 操作按钮行
         btn_main = ttk.Frame(main)
         btn_main.pack(fill="x", pady=(4,8))
-        ttk.Button(btn_main, text="▶  开始生成文书",
+        self._run_btn = ttk.Button(btn_main, text="▶  开始生成文书",
                    style="Run.TButton",
-                   command=self._run_threaded).pack(side="left", padx=(0,12))
+                   command=self._run_threaded)
+        self._run_btn.pack(side="left", padx=(0,12))
         ttk.Button(btn_main, text="📂 打开输出目录",
                    style="Small.TButton",
                    command=self._open_output_dir).pack(side="left", padx=(0,8))
@@ -559,8 +560,18 @@ class App(tk.Tk):
 
     # ── 主流程（线程中运行）────────────────────
     def _run_threaded(self):
+        # 禁用按钮，防止重复点击
+        self._set_btn_state("running")
         t = threading.Thread(target=self._run, daemon=True)
         t.start()
+
+    def _set_btn_state(self, state):
+        def _do():
+            if state == "running":
+                self._run_btn.config(text="⏳  生成中，请稍候...", state="disabled")
+            else:
+                self._run_btn.config(text="▶  开始生成文书", state="normal")
+        self.after(0, _do)
 
     def _run(self):
         self._log("\n" + "="*50)
@@ -596,6 +607,7 @@ class App(tk.Tk):
                 self._log(f"[解析] 从 Excel 读取 {len(records)} 条记录")
             except Exception as e:
                 self._log(f"[错误] 读取 Excel 失败：{e}")
+                self._set_btn_state("normal")
                 return
             errors = []
         else:
@@ -603,10 +615,12 @@ class App(tk.Tk):
             raw = self.input_box.get("1.0","end").strip()
             if not raw:
                 self._log("[错误] 名单为空，请输入或导入名单文本")
+                self._set_btn_state("normal")
                 return
             records = parse_text(raw, fields)
             if not records:
                 self._log("[错误] 解析结果为空，请检查名单格式")
+                self._set_btn_state("normal")
                 return
             self._log(f"[解析] 共 {len(records)} 条记录")
             self._set_progress(10)
@@ -634,6 +648,7 @@ class App(tk.Tk):
         tmpl = self.template_path.get().strip()
         if not tmpl or not Path(tmpl).exists():
             self._log("[错误] 未选择模板文件，请先选择 template.docx")
+            self._set_btn_state("normal")
             return
 
         # ── 批量生成 ──────────────────────────
@@ -666,6 +681,7 @@ class App(tk.Tk):
         self._log(f"   保存目录：{docs_dir}")
         if errors:
             self._log(f"   异常报告：{report_out}")
+        self._set_btn_state("normal")
 
 
 # ─────────────────────────────────────────────
