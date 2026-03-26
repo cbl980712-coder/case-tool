@@ -548,12 +548,26 @@ class App(tk.Tk):
             subprocess.Popen(["xdg-open", path])
 
     def _log(self, msg):
-        def _do():
-            self.log_box.config(state="normal")
-            self.log_box.insert("end", msg + "\n")
-            self.log_box.see("end")
-            self.log_box.config(state="disabled")
-        self.after(0, _do)
+        import queue as _queue
+        if not hasattr(self, "_log_queue"):
+            self._log_queue = _queue.Queue()
+            self._start_log_poll()
+        self._log_queue.put(msg)
+
+    def _start_log_poll(self):
+        def poll():
+            import queue as _queue
+            try:
+                while True:
+                    msg = self._log_queue.get_nowait()
+                    self.log_box.config(state="normal")
+                    self.log_box.insert("end", msg + "\n")
+                    self.log_box.see("end")
+                    self.log_box.config(state="disabled")
+            except _queue.Empty:
+                pass
+            self.after(100, poll)
+        self.after(100, poll)
 
     def _set_progress(self, val, max_val=100):
         self.after(0, lambda: self.progress.config(value=val, maximum=max_val))
