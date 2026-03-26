@@ -319,11 +319,11 @@ class App(tk.Tk):
     def _build_ui(self):
         style = ttk.Style(self)
         style.theme_use("clam")
-        style.configure("TLabelframe.Label", font=("微软雅黑",10,"bold"), foreground="#2F5496")
-        style.configure("Run.TButton", font=("微软雅黑",11,"bold"),
+        style.configure("TLabelframe.Label", font=("Microsoft YaHei",10,"bold") if True else font, foreground="#2F5496")
+        style.configure("Run.TButton", font=("Microsoft YaHei",11,"bold"),
                         background="#2F5496", foreground="white", padding=8)
         style.map("Run.TButton", background=[("active","#1a3a7a")])
-        style.configure("Small.TButton", font=("微软雅黑",9), padding=4)
+        style.configure("Small.TButton", font=("Microsoft YaHei",9), padding=4)
 
         main = ttk.Frame(self, padding=12)
         main.pack(fill="both", expand=True)
@@ -337,7 +337,7 @@ class App(tk.Tk):
                    style="Small.TButton",
                    command=self._pick_input_file).pack(side="left", padx=(0,8))
         ttk.Label(btn_row, text="或直接在下方粘贴名单文本",
-                  font=("微软雅黑",9), foreground="#666").pack(side="left")
+                  font=("Microsoft YaHei",9), foreground="#666").pack(side="left")
         ttk.Button(btn_row, text="清空",
                    style="Small.TButton",
                    command=lambda: self.input_box.delete("1.0","end")).pack(side="right")
@@ -351,14 +351,14 @@ class App(tk.Tk):
         cf_row = ttk.Frame(f1)
         cf_row.pack(fill="x", pady=(6,0))
         ttk.Label(cf_row, text="自定义字段：",
-                  font=("微软雅黑",9)).pack(side="left")
+                  font=("Microsoft YaHei",9)).pack(side="left")
         self.custom_field_entry = ttk.Entry(cf_row, width=12)
         self.custom_field_entry.pack(side="left", padx=4)
         ttk.Button(cf_row, text="＋ 添加字段",
                    style="Small.TButton",
                    command=self._add_custom_field).pack(side="left")
         self.custom_field_label = ttk.Label(cf_row, text="",
-                  font=("微软雅黑",9), foreground="#2F5496")
+                  font=("Microsoft YaHei",9), foreground="#2F5496")
         self.custom_field_label.pack(side="left", padx=8)
 
         # ② 模板文件
@@ -370,13 +370,13 @@ class App(tk.Tk):
                    style="Small.TButton",
                    command=self._pick_template).pack(side="left", padx=(0,8))
         ttk.Label(tmpl_row, textvariable=self.template_path,
-                  font=("微软雅黑",9), foreground="#333",
+                  font=("Microsoft YaHei",9), foreground="#333",
                   wraplength=560, anchor="w").pack(side="left", fill="x", expand=True)
 
         fmt_row = ttk.Frame(f2)
         fmt_row.pack(fill="x", pady=(6,0))
         ttk.Label(fmt_row, text="模板格式：",
-                  font=("微软雅黑",9)).pack(side="left")
+                  font=("Microsoft YaHei",9)).pack(side="left")
         fmts = [
             (".docx", "Word (.docx)  推荐"),
             (".doc",  "旧版Word (.doc)  需LibreOffice"),
@@ -397,12 +397,12 @@ class App(tk.Tk):
                    style="Small.TButton",
                    command=self._pick_excel).pack(side="left", padx=(0,8))
         ttk.Label(cn_row, textvariable=self.excel_path,
-                  font=("微软雅黑",9), foreground="#333",
+                  font=("Microsoft YaHei",9), foreground="#333",
                   wraplength=500, anchor="w").pack(side="left")
         ttk.Label(f3,
                   text="如未导入 Excel，则从名单文本生成（案号留空）。\n"
                        "补录案号后，导入 Excel 再次运行即可生成含案号版本。",
-                  font=("微软雅黑",9), foreground="#666").pack(anchor="w", pady=(4,0))
+                  font=("Microsoft YaHei",9), foreground="#666").pack(anchor="w", pady=(4,0))
 
         # ④ 输出目录
         f4 = ttk.LabelFrame(main, text="④ 文书保存位置", padding=8)
@@ -413,11 +413,11 @@ class App(tk.Tk):
                    style="Small.TButton",
                    command=self._pick_output_dir).pack(side="left", padx=(0,8))
         ttk.Label(od_row, textvariable=self.output_dir,
-                  font=("微软雅黑",10,"bold"), foreground="#2F5496",
+                  font=("Microsoft YaHei",10,"bold") if True else font, foreground="#2F5496",
                   wraplength=560, anchor="w").pack(side="left", fill="x", expand=True)
         ttk.Label(f4,
                   text="生成的文书统一保存到此目录，文件名为对应当事人姓名（含案号时一并体现）。",
-                  font=("微软雅黑",9), foreground="#666").pack(anchor="w", pady=(4,0))
+                  font=("Microsoft YaHei",9), foreground="#666").pack(anchor="w", pady=(4,0))
 
         # 操作按钮行
         btn_main = ttk.Frame(main)
