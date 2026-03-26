@@ -5,6 +5,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-windows:
     runs-on: windows-latest
@@ -24,34 +27,19 @@ jobs:
 
       - name: 打包 EXE
         run: |
-          pyinstaller --onefile --windowed --name "批量文书生成工具v1" --icon NONE run_gui.py
+          pyinstaller --onefile --windowed --name "批量文书生成工具v1" run_gui.py
 
-      - name: 上传 EXE 为 Artifact
+      - name: 上传 Artifact
         uses: actions/upload-artifact@v4
         with:
           name: 批量文书生成工具v1-Windows
           path: dist/批量文书生成工具v1.exe
 
-      - name: 创建 Release
+      - name: 发布 Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v1.0.${{ github.run_number }}
           name: "批量文书生成工具 v1.0.${{ github.run_number }}"
           body: |
-            ## 批量文书生成工具 v1 - Windows 版
-
-            ### 使用方法
-            1. 下载下方 `批量文书生成工具v1.exe`
-            2. 双击运行，无需安装任何依赖
-            3. 按界面提示操作即可
-
-            ### 功能
-            - 批量替换 Word 模板占位符，生成文书
-            - 支持自定义保存目录，文件名自动带姓名/案号
-            - 支持 .docx / .txt 模板格式
-            - 自动生成 Excel 总表和异常报告
+            双击 exe 直接运行，无需安装 Python 或任何依赖。
           files: dist/批量文书生成工具v1.exe
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
