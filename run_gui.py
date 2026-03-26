@@ -548,44 +548,38 @@ class App(tk.Tk):
             subprocess.Popen(["xdg-open", path])
 
     def _log(self, msg):
-        import queue as _queue
-        if not hasattr(self, "_log_queue"):
-            self._log_queue = _queue.Queue()
-            self._start_log_poll()
-        self._log_queue.put(msg)
-
-    def _start_log_poll(self):
-        def poll():
-            import queue as _queue
-            try:
-                while True:
-                    msg = self._log_queue.get_nowait()
-                    self.log_box.config(state="normal")
-                    self.log_box.insert("end", msg + "\n")
-                    self.log_box.see("end")
-                    self.log_box.config(state="disabled")
-            except _queue.Empty:
-                pass
-            self.after(100, poll)
-        self.after(100, poll)
+        try:
+            self.log_box.config(state="normal")
+            self.log_box.insert("end", str(msg) + "\n")
+            self.log_box.see("end")
+            self.log_box.config(state="disabled")
+            self.log_box.update()
+        except Exception:
+            pass
 
     def _set_progress(self, val, max_val=100):
-        self.after(0, lambda: self.progress.config(value=val, maximum=max_val))
+        try:
+            self.progress.config(value=val, maximum=max_val)
+            self.progress.update()
+        except Exception:
+            pass
 
     # ── 主流程（线程中运行）────────────────────
     def _run_threaded(self):
-        # 禁用按钮，防止重复点击
+        # 禁用按钮
         self._set_btn_state("running")
-        t = threading.Thread(target=self._run, daemon=True)
-        t.start()
+        self.update()
+        self._run()
 
     def _set_btn_state(self, state):
-        def _do():
+        try:
             if state == "running":
                 self._run_btn.config(text="⏳  生成中，请稍候...", state="disabled")
             else:
                 self._run_btn.config(text="▶  开始生成文书", state="normal")
-        self.after(0, _do)
+            self.update()
+        except Exception:
+            pass
 
     def _run(self):
         self._log("\n" + "="*50)
